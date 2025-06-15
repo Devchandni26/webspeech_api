@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Advanced Voice Controlled Portfolio</title>
+    <!-- Tailwind CSS CDN for easy styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <!-- Font Awesome for microphone icon -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
+    <style>
+      /* Custom CSS for base styles and animations */
+      body {
+        font-family: "Inter", sans-serif;
+        background: #f0f2f5;
+        color: #333;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        transition: background-color 0.3s ease, color 0.3s ease;
+      }
+
+      /* Dark Mode styles */
+      body.dark-mode {
+        background-color: #1a202c;
+        color: #e2e8f0;
+      }
+
+      .container {
+        max-width: 900px;
+        width: 95%;
+        margin: 20px auto;
+        background-color: #ffffff;
+        border-radius: 12px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        transition: background-color 0.3s ease, box-shadow 0.3s ease;
+      }
+
+      body.dark-mode .container {
+        background-color: #2d3748;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      }
+
+      header {
+        padding: 2.5rem;
+        background-color: #4e54c8;
+        color: white;
+        text-align: center;
+        border-top-left-radius: 12px;
+        border-top-right-radius: 12px;
+        position: relative; /* Needed for absolute positioning of mic icon */
+        overflow: hidden;
+      }
+
+      header h1 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+      }
+
+      header p {
+        font-size: 1.1rem;
+        opacity: 0.9;
+      }
+
+      /* Styling for the control area below the header */
+      .controls {
+        padding: 1.5rem 2.5rem;
+        background-color: #6c63ff; /* Lighter shade of header */
+        color: white;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        align-items: center;
+        gap: 1rem;
+        border-bottom-left-radius: 12px;
+        border-bottom-right-radius: 12px;
+      }
+
+      .action-button {
+        padding: 0.75rem 1.5rem;
+        background-color: #5848db; /* Darker purple for buttons */
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: background-color 0.3s ease, transform 0.2s ease;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+      }
+
+      .action-button:hover:not(:disabled) {
+        background-color: #4337a7;
+        transform: translateY(-2px);
+      }
+
+      .action-button:disabled {
+        background-color: #9ca3af; /* Tailwind gray-400 */
+        cursor: not-allowed;
+        opacity: 0.7;
+        box-shadow: none;
+      }
+
+      #status {
+        margin-top: 0.5rem;
+        font-style: italic;
+        font-size: 0.95rem;
+        color: rgba(255, 255, 255, 0.8);
+        width: 100%; /* Ensure status text takes full width */
+      }
+
+      main {
+        padding: 2.5rem;
+      }
+
+      .section {
+        padding: 2.5rem;
+        border-radius: 8px;
+        margin-bottom: 1.5rem;
+        display: none; /* Hidden by default */
+        transition: opacity 0.5s ease-in-out;
+        background-color: #f8f8f8; /* Light background for sections */
+        color: #333;
+      }
+
+      body.dark-mode .section {
+        background-color: #3e4c5b; /* Darker background for sections in dark mode */
+        color: #e2e8f0;
+      }
+
+      .section.active {
+        display: block; /* Visible when active */
+      }
+
+      .section h2 {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        color: #4e54c8; /* Primary purple color for headings */
+      }
+
+      body.dark-mode .section h2 {
+        color: #92b0ff; /* Lighter purple for headings in dark mode */
+      }
+
+      .project-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 1.5rem;
+        margin-top: 1.5rem;
+      }
+
+      .project-card {
+        background-color: #ffffff;
+        padding: 1.5rem;
+        border-radius: 8px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        text-align: left;
+      }
+
+      body.dark-mode .project-card {
+        background-color: #4a5568;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
+      }
+
+      .project-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+      }
+
+      .project-card h3 {
+        font-size: 1.4rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        color: #6c63ff;
+      }
+      body.dark-mode .project-card h3 {
+        color: #a78bfa; /* Darker purple for headings in dark mode */
+      }
+
+      .project-card p {
+        font-size: 0.95rem;
+        line-height: 1.5;
+        margin-bottom: 0.75rem;
+      }
+
+      .project-card .tech-stack span {
+        display: inline-block;
+        background-color: #e0e7ff;
+        color: #4e54c8;
+        padding: 0.3rem 0.7rem;
+        border-radius: 5px;
+        font-size: 0.8rem;
+        margin-right: 0.5rem;
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+      }
+      body.dark-mode .project-card .tech-stack span {
+        background-color: #6a6a99;
+        color: #c3d9ff;
+      }
+
+      /* Microphone icon and animation */
+      .mic-icon-container {
+        position: absolute;
+        bottom: 10px;
+        right: 10px;
+        width: 40px;
+        height: 40px;
+        background-color: rgba(255, 255, 255, 0.2);
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        opacity: 0; /* Hidden by default */
+        transition: opacity 0.3s ease;
+      }
+
+      .mic-icon-container.listening {
+        opacity: 1; /* Visible when listening */
+      }
+
+      .mic-icon {
+        font-size: 1.5rem;
+        color: white;
+      }
+
+      /* Pulsing animation */
+      @keyframes pulse {
+        0% {
+          transform: scale(1);
+          opacity: 1;
+        }
+        50% {
+          transform: scale(1.1);
+          opacity: 0.7;
+        }
+        100% {
+          transform: scale(1);
+          opacity: 1;
+        }
+      }
+
+      .mic-icon-container.listening .mic-icon {
+        animation: pulse 1.5s infinite ease-in-out;
+      }
+
+      /* Message box styling */
+      #message-box {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: rgba(0, 0, 0, 0.8);
+        color: white;
+        padding: 20px 30px;
+        border-radius: 10px;
+        z-index: 1000;
+        display: none; /* Hidden by default */
+        flex-direction: column;
+        align-items: center;
+        gap: 15px;
+        box-shadow: 0 5px 25px rgba(0, 0, 0, 0.5);
+        max-width: 80%;
+        text-align: center;
+        animation: fadeIn 0.3s ease-out;
+      }
+
+      #message-box.show {
+        display: flex;
+      }
+
+      #message-box button {
+        background-color: #6c63ff;
+        padding: 8px 15px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 1rem;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translate(-50%, -60%);
+        }
+        to {
+          opacity: 1;
+          transform: translate(-50%, -50%);
+        }
+      }
+
+      /* Responsive adjustments */
+      @media (max-width: 768px) {
+        header h1 {
+          font-size: 2rem;
+        }
+        header p {
+          font-size: 1rem;
+        }
+        .controls {
+          flex-direction: column;
+          padding: 1rem;
+        }
+        .action-button {
+          width: 100%;
+          justify-content: center;
+        }
+        main {
+          padding: 1.5rem;
+        }
+        .section {
+          padding: 1.5rem;
+        }
+        .section h2 {
+          font-size: 1.8rem;
+        }
+        .project-card h3 {
+          font-size: 1.2rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <h1>👨‍💻 My Voice Portfolio</h1>
+        <p>Say: "Go to About", "Go to Projects", or "Go to Contact"</p>
+        <div class="controls">
+          <button id="start-btn" class="action-button">
+            <i class="fas fa-microphone"></i>
+            <span id="start-btn-text">Start Listening</span>
+          </button>
+          <button id="toggle-continuous-btn" class="action-button">
+            <i class="fas fa-redo"></i>
+            <span id="continuous-btn-text">Enable Continuous</span>
+          </button>
+          <p id="status" class="text-center w-full mt-2 text-sm opacity-80">
+            Status: Not listening
+          </p>
+        </div>
+        <div id="mic-icon-container" class="mic-icon-container">
+          <i class="fas fa-microphone mic-icon"></i>
+        </div>
+      </header>
+
+      <main>
+        <!-- About Section -->
+        <section id="about" class="section active">
+          <h2>About Me</h2>
+          <p class="text-lg mb-4">
+            Hi! I’m a passionate web developer with a knack for building dynamic
+            and user-friendly web applications. I love bringing ideas to life
+            through code and continuously learning new technologies.
+          </p>
+          <p class="text-md leading-relaxed">
+            My journey in web development began with a fascination for how
+            websites are built and how they can connect people globally. I
+            specialize in front-end development, creating engaging user
+            interfaces, but also have experience with back-end technologies to
+            build full-stack solutions.
+          </p>
+          <p class="mt-4 text-md leading-relaxed">
+            I thrive on problem-solving and enjoy the challenge of turning
+            complex requirements into elegant and efficient code. I'm always
+            eager to explore new tools and frameworks to enhance my skill set
+            and deliver high-quality projects.
+          </p>
+        </section>
+
+        <!-- Projects Section -->
+        <section id="projects" class="section">
+          <h2>Projects</h2>
+          <div class="project-grid">
+            <div class="project-card" data-tech="React,Node.js">
+              <h3>E-commerce Platform</h3>
+              <p>
+                A full-stack e-commerce solution with user authentication,
+                product listings, shopping cart, and order processing.
+              </p>
+              <div class="tech-stack">
+                <span>React</span><span>Node.js</span><span>Express</span
+                ><span>MongoDB</span>
+              </div>
+            </div>
+            <div class="project-card" data-tech="Vue.js,Firebase">
+              <h3>Real-time Chat App</h3>
+              <p>
+                A real-time messaging application using websockets for instant
+                communication and user presence.
+              </p>
+              <div class="tech-stack">
+                <span>Vue.js</span><span>Firebase</span><span>WebSockets</span>
+              </div>
+            </div>
+            <div class="project-card" data-tech="Python,Django">
+              <h3>Task Management API</h3>
+              <p>
+                A RESTful API for managing tasks, users, and categories with
+                robust authentication and data validation.
+              </p>
+              <div class="tech-stack">
+                <span>Python</span><span>Django</span><span>REST Framework</span
+                ><span>PostgreSQL</span>
+              </div>
+            </div>
+            <div class="project-card" data-tech="HTML,CSS,JavaScript">
+              <h3>Interactive Landing Page</h3>
+              <p>
+                A highly interactive and responsive landing page featuring
+                dynamic animations and a modern design.
+              </p>
+              <div class="tech-stack">
+                <span>HTML5</span><span>CSS3</span><span>JavaScript</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Contact Section -->
+        <section id="contact" class="section">
+          <h2>Contact</h2>
+          <p class="text-lg mb-4">
+            Feel free to reach out to me for collaborations, inquiries, or just
+            a chat!
+          </p>
+          <p class="text-xl font-bold mb-2">
+            Email:
+            <a
+              href="mailto:example@example.com"
+              class="text-blue-600 hover:underline"
+              >example@example.com</a
+            >
+          </p>
+          <p class="text-md">
+            LinkedIn:
+            <a href="#" class="text-blue-600 hover:underline"
+              >linkedin.com/in/yourprofile</a
+            >
+          </p>
+          <p class="text-md">
+            GitHub:
+            <a href="#" class="text-blue-600 hover:underline"
+              >github.com/yourusername</a
+            >
+          </p>
+        </section>
+      </main>
+    </div>
+
+    <!-- Custom Message Box -->
+    <div id="message-box">
+      <p id="message-content" class="text-lg"></p>
+      <button id="message-box-ok-btn">OK</button>
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        // --- DOM Element References ---
+        const aboutSection = document.getElementById("about");
+        const projectSection = document.getElementById("projects");
+        const contactSection = document.getElementById("contact");
+        const statusText = document.getElementById("status");
+        const startBtn = document.getElementById("start-btn");
+        const startBtnText = document.getElementById("start-btn-text");
+        const toggleContinuousBtn = document.getElementById(
+          "toggle-continuous-btn"
+        );
+        const continuousBtnText = document.getElementById(
+          "continuous-btn-text"
+        );
+        const micIconContainer = document.getElementById("mic-icon-container");
+        const allSections = document.querySelectorAll(".section");
+        const projectCards = document.querySelectorAll(".project-card");
+
+        // Message box elements
+        const messageBox = document.getElementById("message-box");
+        const messageContent = document.getElementById("message-content");
+        const messageBoxOkBtn = document.getElementById("message-box-ok-btn");
+
+        // --- Voice API Initialization & State ---
+        const SpeechRecognition =
+          window.SpeechRecognition || window.webkitSpeechRecognition;
+        const SpeechSynthesis = window.speechSynthesis;
+
+        let recognition = null;
+        let currentSection = "about"; // Keep track of the currently active section
+        let isContinuousListening = false;
+        let autoRestartRecognition = false; // Used to manage continuous mode restarts
+        let utteranceQueue = []; // Queue for speech synthesis utterances
+        let isSpeaking = false; // Flag to prevent overlapping speech
+
+        // --- Data for contextual commands and projects ---
+        const projectsData = [
+          {
+            name: "e-commerce platform",
+            description:
+              "The E-commerce Platform is a full-stack solution designed for online shopping. It features user authentication, a comprehensive product catalog, a functional shopping cart, and a streamlined order processing system. It was built using React for the front-end, Node.js and Express for the back-end API, and MongoDB for database management.",
+            tech: ["React", "Node.js", "Express", "MongoDB"],
+          },
+          {
+            name: "real-time chat app",
+            description:
+              "The Real-time Chat App enables instant communication between users. It leverages WebSockets for real-time messaging capabilities and Firebase for backend services like authentication and database operations, ensuring a dynamic and responsive user experience.",
+            tech: ["Vue.js", "Firebase", "WebSockets"],
+          },
+          {
+            name: "task management api",
+            description:
+              "The Task Management API is a robust RESTful service built with Python and Django. It provides endpoints for managing tasks, user accounts, and categories, complete with strong authentication and data validation to ensure data integrity and security.",
+            tech: ["Python", "Django", "REST Framework", "PostgreSQL"],
+          },
+          {
+            name: "interactive landing page",
+            description:
+              "The Interactive Landing Page is a modern, responsive web page crafted with HTML5, CSS3, and JavaScript. It features dynamic animations and smooth transitions to create an engaging and visually appealing user experience across all devices.",
+            tech: ["HTML", "CSS", "JavaScript"],
+          },
+        ];
+
+        const aboutData = {
+          skills: {
+            javascript:
+              "I have extensive experience with JavaScript, using it for both front-end interactivity and back-end development with Node.js.",
+            react:
+              "React is one of my core strengths. I've built numerous single-page applications, focusing on component-based architecture and state management.",
+            nodejs:
+              "I'm proficient in Node.js for building scalable server-side applications, REST APIs, and microservices.",
+            html: "I possess strong skills in HTML5 for structuring web content semantically and accessibly.",
+            css: "I have expertise in CSS3 for styling and responsive design, including frameworks like Tailwind CSS.",
+            frontend:
+              "My front-end expertise includes building responsive user interfaces, optimizing performance, and ensuring cross-browser compatibility.",
+            backend:
+              "On the back-end, I'm skilled in developing robust APIs, managing databases, and implementing server-side logic.",
+          },
+          experience:
+            "I have X years of experience in web development, working on diverse projects from e-commerce platforms to real-time applications. My professional journey has equipped me with strong problem-solving skills and a collaborative mindset.",
+          education:
+            "I hold a Bachelor's degree in Computer Science from [Your University], where I gained a strong foundation in algorithms, data structures, and software engineering principles.",
+        };
+
+        const jokes = [
+          "Why don't scientists trust atoms? Because they make up everything!",
+          "What do you call a fake noodle? An impasta!",
+          "Why did the scarecrow win an award? Because he was outstanding in his field!",
+          "I told my wife she was drawing her eyebrows too high. She looked surprised.",
+        ];
+
+        const favoriteColors = [
+          "My favorite color is a deep, calming blue, like the ocean on a clear day.",
+          "I'm quite fond of a vibrant green, it symbolizes growth and freshness.",
+        ];
+
+        // --- Helper Functions ---
+
+        // Custom message box instead of alert()
+        function showMessageBox(message) {
+          messageContent.textContent = message;
+          messageBox.classList.add("show");
+        }
+
+        messageBoxOkBtn.addEventListener("click", () => {
+          messageBox.classList.remove("show");
+        });
+
+        // Function to speak text using Web Speech Synthesis API
+        function speak(text) {
+          if (!SpeechSynthesis) {
+            console.warn("Speech Synthesis API not supported.");
+            return;
+          }
+
+          const utterance = new SpeechSynthesisUtterance(text);
+          utterance.lang = "en-US";
+          utterance.pitch = 1; // 0 to 2
+          utterance.rate = 1; // 0.1 to 10
+          utterance.volume = 1; // 0 to 1
+
+          utterance.onend = () => {
+            isSpeaking = false;
+            processUtteranceQueue(); // Process next utterance if available
+          };
+          utterance.onerror = (event) => {
+            console.error("SpeechSynthesisUtterance.onerror", event);
+            isSpeaking = false;
+            processUtteranceQueue();
+          };
+
+          utteranceQueue.push(utterance);
+          if (!isSpeaking) {
+            processUtteranceQueue();
+          }
+        }
+
+        function processUtteranceQueue() {
+          if (utteranceQueue.length > 0 && !isSpeaking) {
+            isSpeaking = true;
+            const nextUtterance = utteranceQueue.shift();
+            SpeechSynthesis.speak(nextUtterance);
+          }
+        }
+
+        // Function to show a specific section and update currentSection state
+        function showSection(sectionId) {
+          allSections.forEach((section) => {
+            section.classList.remove("active");
+          });
+          const targetSection = document.getElementById(sectionId);
+          if (targetSection) {
+            targetSection.classList.add("active");
+            currentSection = sectionId;
+            statusText.textContent = `Status: Showing ${sectionId} section.`;
+            speak(`Navigating to ${sectionId} section.`);
+          } else {
+            statusText.textContent = `Error: Section ${sectionId} not found.`;
+            speak(`Sorry, I couldn't find the ${sectionId} section.`);
+          }
+        }
+
+        // Function to filter projects by technology
+        function filterProjectsByTech(tech) {
+          let found = false;
+          projectCards.forEach((card) => {
+            const techStack = card.dataset.tech
+              ? card.dataset.tech.toLowerCase().split(",")
+              : [];
+            if (techStack.includes(tech.toLowerCase().trim())) {
+              card.style.display = "block"; // Show card
+              found = true;
+            } else {
+              card.style.display = "none"; // Hide card
+            }
+          });
+
+          if (!found) {
+            speak(
+              `I couldn't find any projects with ${tech}. Showing all projects.`
+            );
+            // Show all projects if no filter match
+            projectCards.forEach((card) => (card.style.display = "block"));
+          } else {
+            speak(`Showing projects related to ${tech}.`);
+          }
+        }
+
+        // Function to reset project filters
+        function resetProjectFilters() {
+          projectCards.forEach((card) => (card.style.display = "block"));
+          speak("All projects are now visible.");
+        }
+
+        // Function to toggle dark/light mode
+        function toggleTheme(mode) {
+          if (mode === "dark") {
+            document.body.classList.add("dark-mode");
+            speak("Switching to dark mode.");
+          } else if (mode === "light") {
+            document.body.classList.remove("dark-mode");
+            speak("Switching to light mode.");
+          } else {
+            // Toggle if no specific mode is given
+            document.body.classList.toggle("dark-mode");
+            if (document.body.classList.contains("dark-mode")) {
+              speak("Toggled to dark mode.");
+            } else {
+              speak("Toggled to light mode.");
+            }
+          }
+        }
+
+        // --- Main Voice Command Handler ---
+        function handleVoiceCommand(transcript) {
+          statusText.textContent = `Heard: "${transcript}"`;
+
+          // --- Global Commands (always available) ---
+          if (
+            transcript.includes("go to about") ||
+            transcript.includes("show about") ||
+            transcript.includes("about me")
+          ) {
+            showSection("about");
+          } else if (
+            transcript.includes("go to projects") ||
+            transcript.includes("show projects")
+          ) {
+            showSection("projects");
+          } else if (
+            transcript.includes("go to contact") ||
+            transcript.includes("show contact")
+          ) {
+            showSection("contact");
+          } else if (
+            transcript.includes("what can i say") ||
+            transcript.includes("help me navigate")
+          ) {
+            speak(
+              "You can say 'Go to About', 'Go to Projects', 'Go to Contact', 'Dark mode', 'Light mode', or 'Tell me a joke'."
+            );
+          } else if (transcript.includes("dark mode")) {
+            toggleTheme("dark");
+          } else if (transcript.includes("light mode")) {
+            toggleTheme("light");
+          } else if (transcript.includes("tell me a joke")) {
+            const randomJoke = jokes[Math.floor(Math.random() * jokes.length)];
+            speak(randomJoke);
+          } else if (
+            transcript.includes("what is your favorite color") ||
+            transcript.includes("what's your favorite color")
+          ) {
+            const randomColorResponse =
+              favoriteColors[Math.floor(Math.random() * favoriteColors.length)];
+            speak(randomColorResponse);
+          }
+          // --- Contextual Commands (depend on current section) ---
+          else if (currentSection === "projects") {
+            let projectMatched = false;
+            for (const project of projectsData) {
+              if (transcript.includes(project.name)) {
+                speak(project.description);
+                projectMatched = true;
+                break;
+              }
+            }
+            if (projectMatched) return; // Command handled
+
+            // Check for tech-based filtering
+            const techMatch = transcript.match(/show me (.+) projects/);
+            if (techMatch && techMatch[1]) {
+              const tech = techMatch[1].trim();
+              filterProjectsByTech(tech);
+            } else if (
+              transcript.includes("show all projects") ||
+              transcript.includes("reset projects")
+            ) {
+              resetProjectFilters();
+            } else {
+              speak(
+                "I didn't understand that project command. You can say 'Tell me about E-commerce Platform', or 'Show me React projects'."
+              );
+            }
+          } else if (currentSection === "about") {
+            let skillMatched = false;
+            for (const skill in aboutData.skills) {
+              if (transcript.includes(skill)) {
+                speak(`Regarding ${skill}, ${aboutData.skills[skill]}`);
+                skillMatched = true;
+                break;
+              }
+            }
+            if (skillMatched) return; // Command handled
+
+            if (transcript.includes("your experience")) {
+              speak(aboutData.experience);
+            } else if (transcript.includes("your education")) {
+              speak(aboutData.education);
+            } else {
+              speak(
+                "I didn't understand that about me command. You can say 'Tell me about your JavaScript experience' or 'What is your education?'."
+              );
+            }
+          }
+          // --- Unrecognized Command ---
+          else {
+            statusText.textContent =
+              "Unrecognized command. Say 'What can I say?' for help.";
+            speak(
+              "Sorry, I didn't understand that command. Please try again or say 'What can I say?' for available commands."
+            );
+          }
+        }
+
+        // --- Speech Recognition Event Handlers ---
+
+        // Check for API support
+        if (!SpeechRecognition) {
+          showMessageBox(
+            "Speech Recognition not supported in your browser. Please use Google Chrome for full functionality."
+          );
+          startBtn.disabled = true;
+          toggleContinuousBtn.disabled = true;
+        } else {
+          recognition = new SpeechRecognition();
+          recognition.lang = "en-US";
+          // continuous will be set based on isContinuousListening state
+          recognition.interimResults = false;
+
+          recognition.onstart = () => {
+            statusText.textContent = "Status: Listening...";
+            startBtnText.textContent = "Listening...";
+            startBtn.disabled = true;
+            micIconContainer.classList.add("listening"); // Show mic animation
+            if (!isContinuousListening) {
+              toggleContinuousBtn.disabled = true; // Disable toggle when not in continuous mode and listening
+            }
+          };
+
+          recognition.onresult = (event) => {
+            const transcript = event.results[0][0].transcript.toLowerCase();
+            handleVoiceCommand(transcript);
+          };
+
+          recognition.onerror = (event) => {
+            console.error("Speech recognition error:", event.error);
+            statusText.textContent = `Status: Error - ${event.error}.`;
+            speak(`There was an error: ${event.error}.`);
+
+            // Specific error messages for better UX
+            if (event.error === "not-allowed") {
+              showMessageBox(
+                "Microphone access denied. Please allow microphone permissions in your browser settings to use voice control."
+              );
+            } else if (event.error === "no-speech") {
+              statusText.textContent += " No speech detected.";
+              // No specific speak for no-speech, as it can be frequent in continuous mode
+            }
+          };
+
+          recognition.onend = () => {
+            statusText.textContent = "Status: Not listening.";
+            startBtnText.textContent = "Start Listening";
+            startBtn.disabled = false;
+            micIconContainer.classList.remove("listening"); // Hide mic animation
+
+            if (isContinuousListening) {
+              autoRestartRecognition = true; // Flag to auto-restart
+              recognition.start(); // Restart listening automatically
+            } else {
+              autoRestartRecognition = false;
+              toggleContinuousBtn.disabled = false; // Re-enable toggle after a single session
+            }
+          };
+
+          // --- Button Event Listeners ---
+          startBtn.addEventListener("click", () => {
+            if (isContinuousListening) {
+              // If continuous mode is on, this button becomes a stop button
+              recognition.stop();
+              isContinuousListening = false;
+              continuousBtnText.textContent = "Enable Continuous";
+              recognition.continuous = false; // Reset recognition property
+              statusText.textContent = "Status: Continuous listening disabled.";
+              speak("Continuous listening disabled.");
+            } else {
+              recognition.continuous = false; // Ensure single shot
+              recognition.start();
+            }
+          });
+
+          toggleContinuousBtn.addEventListener("click", () => {
+            isContinuousListening = !isContinuousListening;
+            if (isContinuousListening) {
+              continuousBtnText.textContent = "Disable Continuous";
+              recognition.continuous = true; // Set recognition to continuous
+              startBtnText.textContent = "Stop Listening"; // Change primary button text
+              statusText.textContent =
+                "Status: Continuous listening enabled. Saying 'Stop Listening' will disable it.";
+              speak("Continuous listening enabled. Say commands anytime.");
+              recognition.start(); // Start listening in continuous mode
+            } else {
+              continuousBtnText.textContent = "Enable Continuous";
+              recognition.stop(); // Stop current listening session
+              recognition.continuous = false; // Reset recognition property
+              startBtnText.textContent = "Start Listening"; // Reset primary button text
+              statusText.textContent = "Status: Continuous listening disabled.";
+              speak("Continuous listening disabled.");
+            }
+          });
+
+          // Initial setup: Show about section by default
+          showSection("about");
+        }
+      });
+    </script>
+  </body>
+</html>
