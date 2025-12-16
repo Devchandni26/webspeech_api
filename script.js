@@ -4,7 +4,7 @@ const contactSection = document.getElementById("contact");
 const statusText = document.getElementById("status");
 const startBtn = document.getElementById("start-btn");
 
-// Check if browser supports SpeechRecognition
+
 const SpeechRecognition =
   window.SpeechRecognition || window.webkitSpeechRecognition;
 

@@ -4,19 +4,19 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Advanced Voice Controlled Portfolio</title>
-    <!-- Tailwind CSS CDN for easy styling -->
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <link
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap"
       rel="stylesheet"
     />
-    <!-- Font Awesome for microphone icon -->
+    
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
     />
     <style>
-      /* Custom CSS for base styles and animations */
+   
       body {
         font-family: "Inter", sans-serif;
         background: #f0f2f5;
@@ -60,7 +60,7 @@
         text-align: center;
         border-top-left-radius: 12px;
         border-top-right-radius: 12px;
-        position: relative; /* Needed for absolute positioning of mic icon */
+        position: relative; 
         overflow: hidden;
       }
 
@@ -75,10 +75,9 @@
         opacity: 0.9;
       }
 
-      /* Styling for the control area below the header */
       .controls {
         padding: 1.5rem 2.5rem;
-        background-color: #6c63ff; /* Lighter shade of header */
+        background-color: #6c63ff;
         color: white;
         display: flex;
         flex-wrap: wrap;
@@ -91,7 +90,7 @@
 
       .action-button {
         padding: 0.75rem 1.5rem;
-        background-color: #5848db; /* Darker purple for buttons */
+        background-color: #5848db;
         color: white;
         border: none;
         border-radius: 8px;
@@ -110,7 +109,7 @@
       }
 
       .action-button:disabled {
-        background-color: #9ca3af; /* Tailwind gray-400 */
+        background-color: #9ca3af;
         cursor: not-allowed;
         opacity: 0.7;
         box-shadow: none;
@@ -121,7 +120,7 @@
         font-style: italic;
         font-size: 0.95rem;
         color: rgba(255, 255, 255, 0.8);
-        width: 100%; /* Ensure status text takes full width */
+        width: 100%;
       }
 
       main {
@@ -132,30 +131,30 @@
         padding: 2.5rem;
         border-radius: 8px;
         margin-bottom: 1.5rem;
-        display: none; /* Hidden by default */
+        display: none; 
         transition: opacity 0.5s ease-in-out;
-        background-color: #f8f8f8; /* Light background for sections */
+        background-color: #f8f8f8;
         color: #333;
       }
 
       body.dark-mode .section {
-        background-color: #3e4c5b; /* Darker background for sections in dark mode */
+        background-color: #3e4c5b;
         color: #e2e8f0;
       }
 
       .section.active {
-        display: block; /* Visible when active */
+        display: block; 
       }
 
       .section h2 {
         font-size: 2rem;
         font-weight: 700;
         margin-bottom: 1rem;
-        color: #4e54c8; /* Primary purple color for headings */
+        color: #4e54c8;
       }
 
       body.dark-mode .section h2 {
-        color: #92b0ff; /* Lighter purple for headings in dark mode */
+        color: #92b0ff; 
       }
 
       .project-grid {
@@ -191,7 +190,7 @@
         color: #6c63ff;
       }
       body.dark-mode .project-card h3 {
-        color: #a78bfa; /* Darker purple for headings in dark mode */
+        color: #a78bfa; 
       }
 
       .project-card p {
@@ -216,7 +215,7 @@
         color: #c3d9ff;
       }
 
-      /* Microphone icon and animation */
+    
       .mic-icon-container {
         position: absolute;
         bottom: 10px;
@@ -228,12 +227,12 @@
         display: flex;
         justify-content: center;
         align-items: center;
-        opacity: 0; /* Hidden by default */
+        opacity: 0; 
         transition: opacity 0.3s ease;
       }
 
       .mic-icon-container.listening {
-        opacity: 1; /* Visible when listening */
+        opacity: 1;
       }
 
       .mic-icon {
@@ -241,7 +240,7 @@
         color: white;
       }
 
-      /* Pulsing animation */
+      
       @keyframes pulse {
         0% {
           transform: scale(1);
@@ -261,7 +260,7 @@
         animation: pulse 1.5s infinite ease-in-out;
       }
 
-      /* Message box styling */
+  
       #message-box {
         position: fixed;
         top: 50%;
@@ -272,7 +271,7 @@
         padding: 20px 30px;
         border-radius: 10px;
         z-index: 1000;
-        display: none; /* Hidden by default */
+        display: none;
         flex-direction: column;
         align-items: center;
         gap: 15px;
@@ -305,7 +304,7 @@
         }
       }
 
-      /* Responsive adjustments */
+      
       @media (max-width: 768px) {
         header h1 {
           font-size: 2rem;
